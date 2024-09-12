@@ -13,9 +13,11 @@ type ProductDetailsProps = {
   product: Product
 }
 
-export async function action({ params }: ActionFunctionArgs) {
+export async function action({ request, params }: ActionFunctionArgs) {
+  const formData = Object.fromEntries(await request.formData())
+  const token = formData.token
   if (params.id !== undefined) {
-    await deleteProduct(+params.id)
+    await deleteProduct(+params.id, token)
     return redirect('/')
   }
 }
@@ -24,6 +26,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
   const [isEditingStock, setIsEditingStock] = useState(false)
   const [stock, setStock] = useState(product.stock)
 
+  const token = localStorage.getItem('token') as string
   const role = localStorage.getItem('role')
 
   const navigateEdit = useNavigate()
@@ -55,6 +58,11 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                 className='w-full flex'
                 onSubmit={handleStockSave}
               >
+                <input
+                  type='hidden'
+                  name='token'
+                  value={token}
+                />
                 <input
                   type='number'
                   name='stock'
@@ -99,6 +107,11 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                 }
               }}
             >
+              <input
+                type='hidden'
+                name='token'
+                value={token}
+              />
               <input
                 type='submit'
                 value='Delete'

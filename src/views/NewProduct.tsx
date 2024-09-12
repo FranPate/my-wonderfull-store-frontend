@@ -10,21 +10,24 @@ import { addProduct } from '../services/ProductService'
 import ProductForm from '../components/ProductForm'
 
 export async function action({ request }: ActionFunctionArgs) {
-  const data = Object.fromEntries(await request.formData())
+  const formData = Object.fromEntries(await request.formData())
+  const token = formData.token
+  const { token: _, ...productData } = formData
   let error = ''
-  if (Object.values(data).includes('')) {
+  if (Object.values(productData).includes('')) {
     error = 'Todos los campos son obligatorios'
   }
   if (error.length) {
     return error
   }
-  await addProduct(data)
+  await addProduct(productData, token)
 
   return redirect('/')
 }
 
 export default function NewProduct() {
   const error = useActionData() as string
+  const token = localStorage.getItem('token') as string
 
   return (
     <>
@@ -44,6 +47,11 @@ export default function NewProduct() {
         className='mt-10'
         method='POST'
       >
+        <input
+          type='hidden'
+          name='token'
+          value={token}
+        />
         <ProductForm />
         <input
           type='submit'

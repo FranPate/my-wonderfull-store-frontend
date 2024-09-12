@@ -23,9 +23,11 @@ export async function loader({ params }: LoaderFunctionArgs) {
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
-  const data = Object.fromEntries(await request.formData())
+  const formData = Object.fromEntries(await request.formData())
+  const token = formData.token
+  const { token: _, ...productData } = formData
   let error = ''
-  if (Object.values(data).includes('')) {
+  if (Object.values(formData).includes('')) {
     error = 'Todos los campos son obligatorios'
   }
   if (error.length) {
@@ -33,7 +35,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
   }
 
   if (params.id !== undefined) {
-    await updateProduct(data, +params.id)
+    await updateProduct(productData, +params.id, token)
     return redirect('/')
   }
 }
@@ -41,6 +43,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 export default function EditProduct() {
   const product = useLoaderData() as Product
   const error = useActionData() as string
+  const token = localStorage.getItem('token') as string
 
   return (
     <>
@@ -60,6 +63,11 @@ export default function EditProduct() {
         className='mt-10'
         method='POST'
       >
+        <input
+          type='hidden'
+          name='token'
+          value={token}
+        />
         <ProductForm product={product} />
         <input
           type='submit'

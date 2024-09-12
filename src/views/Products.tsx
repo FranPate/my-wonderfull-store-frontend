@@ -10,9 +10,11 @@ export async function loader() {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-  const data = Object.fromEntries(await request.formData())
-  await updateProductStock(+data.id, data)
-  return {}
+  const formData = Object.fromEntries(await request.formData())
+  const token = formData.token
+  const { token: _, ...productData } = formData
+  await updateProductStock(+formData.id, productData, token)
+  return { message: 'Stock updated' }
 }
 
 export default function Products() {

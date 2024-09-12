@@ -11,13 +11,12 @@ type ProductData = {
   [k: string]: FormDataEntryValue
 }
 
-const config = {
-  headers: {
-    Authorization: `Bearer ${localStorage.getItem('token')}`
+export async function addProduct(data: ProductData, token: FormDataEntryValue) {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
   }
-}
-
-export async function addProduct(data: ProductData) {
   try {
     const result = safeParse(DraftProductSchema, {
       title: data.title,
@@ -52,7 +51,7 @@ export async function addProduct(data: ProductData) {
 export async function getProducts() {
   try {
     const url = `${import.meta.env.VITE_API_URL}/products/products`
-    const { data } = await axios.get(url, config)
+    const { data } = await axios.get(url)
     const result = safeParse(ProductsSchema, data.data)
     if (result.success) {
       return result.output
@@ -64,8 +63,8 @@ export async function getProducts() {
 
 export async function getProductById(id: Product['id']) {
   try {
-    const url = `${import.meta.env.VITE_API_URL}/products/product/${id}`
-    const { data } = await axios.get(url, config)
+    const url = `${import.meta.env.VITE_API_URL}/products/product/get/${id}`
+    const { data } = await axios.get(url)
     const result = safeParse(ProductSchema, data.data)
     if (result.success) {
       return result.output
@@ -75,7 +74,16 @@ export async function getProductById(id: Product['id']) {
   } catch (error) {}
 }
 
-export async function updateProduct(data: ProductData, id: Product['id']) {
+export async function updateProduct(
+  data: ProductData,
+  id: Product['id'],
+  token: FormDataEntryValue
+) {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  }
   try {
     const result = safeParse(ProductSchema, {
       id,
@@ -87,7 +95,7 @@ export async function updateProduct(data: ProductData, id: Product['id']) {
       thumbnail: data.thumbnail
     })
     if (result.success) {
-      const url = `${import.meta.env.VITE_API_URL}/products/product/${
+      const url = `${import.meta.env.VITE_API_URL}/products/product/id/${
         result.output.id
       }`
       await axios.put(url, result.output, config)
@@ -99,18 +107,35 @@ export async function updateProduct(data: ProductData, id: Product['id']) {
   }
 }
 
-export async function deleteProduct(id: Product['id']) {
+export async function deleteProduct(
+  id: Product['id'],
+  token: FormDataEntryValue
+) {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  }
   try {
-    const url = `${import.meta.env.VITE_API_URL}/products/product/${id}`
+    const url = `${import.meta.env.VITE_API_URL}/products/product/id/${id}`
     await axios.delete(url, config)
   } catch (error) {
     console.log(error)
   }
 }
 
-export async function updateProductStock(id: Product['id'], data: ProductData) {
+export async function updateProductStock(
+  id: Product['id'],
+  data: ProductData,
+  token: FormDataEntryValue
+) {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  }
   try {
-    const url = `${import.meta.env.VITE_API_URL}/products/product/${id}`
+    const url = `${import.meta.env.VITE_API_URL}/products/product/id/${id}`
     await axios.patch(url, data, config)
   } catch (error) {
     console.log(error)
@@ -119,8 +144,10 @@ export async function updateProductStock(id: Product['id'], data: ProductData) {
 
 export async function getProductByTitle(title: Product['title']) {
   try {
-    const url = `${import.meta.env.VITE_API_URL}/products/product/${title}`
-    const { data } = await axios.get(url, config)
+    const url = `${
+      import.meta.env.VITE_API_URL
+    }/products/product/search/${title}`
+    const { data } = await axios.get(url)
     const result = safeParse(ProductSchema, data.data)
     if (result.success) {
       return result.output

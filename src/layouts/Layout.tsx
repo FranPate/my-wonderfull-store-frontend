@@ -3,6 +3,10 @@ import { Link, Outlet } from 'react-router-dom'
 export default function Layout() {
   const token = localStorage.getItem('token')
 
+  const handleLogout = () => {
+    localStorage.clear()
+  }
+
   return (
     <>
       <header className='bg-slate-800'>
@@ -28,7 +32,7 @@ export default function Layout() {
               </>
             ) : (
               <button
-                onClick={localStorage.clear}
+                onClick={handleLogout}
                 className='bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600'
               >
                 Logout
