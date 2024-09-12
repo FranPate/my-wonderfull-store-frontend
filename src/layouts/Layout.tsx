@@ -1,8 +1,7 @@
 import { Link, Outlet } from 'react-router-dom'
-import { useAuth } from '../context/auth'
 
 export default function Layout() {
-  const { isAuthenticated, logout } = useAuth()
+  const token = localStorage.getItem('token')
 
   return (
     <>
@@ -12,7 +11,7 @@ export default function Layout() {
             My Wonderful Store
           </h1>
           <div className='space-x-4'>
-            {!isAuthenticated ? (
+            {!token ? (
               <>
                 <Link
                   to='/login'
@@ -29,7 +28,7 @@ export default function Layout() {
               </>
             ) : (
               <button
-                onClick={logout}
+                onClick={localStorage.clear}
                 className='bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600'
               >
                 Logout
